@@ -81,7 +81,7 @@ public class TrackUtils {
     /**
      * Private constructor to make class static only
      */
-    private TrackUtils() {
+    public TrackUtils() {
     }
 
     public static Hep3Vector extrapolateTrackPositionToSensor(Track track, HpsSiSensor sensor, List<HpsSiSensor> sensors, double bfield) {
