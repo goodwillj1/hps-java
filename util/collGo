@@ -1,0 +1,7 @@
+mvn install -DskipTests=true
+
+java -cp ~/hps-java/distribution/target/hps-distribution-4.5-SNAPSHOT-bin.jar org.hps.analysis.util.PrintCollectionsUtility -R 7000 -d HPS-PhysicsRun2016-Pass2  -i /home/goodwill/hps2019/data/muonSkim/hps_010650.evio.011_muonSkim_8.evio_skimMuMu.slcio
+
+
+// /home/goodwill/hps2016/work/hallb/hps/data/physrun2016/pass4/skim/v0/hps_008072.55_v0_4.2.slcio
+

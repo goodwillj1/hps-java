@@ -1,0 +1,20 @@
+<lcsim xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="http://www.lcsim.org/schemas/lcsim/1.0/lcsim.xsd">
+    <execute>
+        <driver name="EcalRawConverter" />
+        <driver name="EcalEventDisplay" />         <!-- Ecal event display -->
+    </execute>
+    <drivers>
+        <driver name="EcalRawConverter" type="org.hps.recon.ecal.EcalRawConverterDriver">
+            <applyBadCrystalMap>false</applyBadCrystalMap>
+        </driver>
+        <driver name="EcalEventDisplay" type="org.hps.monitoring.ecal.plots.EcalEventDisplayWithRawWaveform">
+            <inputCollection>EcalCalHits</inputCollection>
+            <inputCollectionRaw>EcalReadoutHits</inputCollectionRaw>
+            <inputClusterCollection>EcalClusters</inputClusterCollection>
+            <pedSamples>20</pedSamples>
+            <maxEch>5.0</maxEch>
+            <minEch>0.005</minEch>
+            <eventRefreshRate>5</eventRefreshRate>
+        </driver>
+    </drivers>
+</lcsim>

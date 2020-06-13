@@ -1,0 +1,13 @@
+<!-- 
+    Steering configuration for data monitoring of RawCalorimeterHit collections.
+-->
+<lcsim xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="http://www.lcsim.org/schemas/lcsim/1.0/lcsim.xsd">
+    <execute>
+        <driver name="RawCalorimeterHitMonitoringDriver"/>
+        <!-- <driver name="RawCalorimeterHitStripChartDriver"/>  -->
+    </execute>
+    <drivers>
+        <driver name="RawCalorimeterHitMonitoringDriver" type="org.hps.monitoring.ecal.plots.RawCalorimeterHitMonitoringDriver">
+        </driver>
+    </drivers>
+</lcsim>

@@ -17,7 +17,7 @@ public class EcalClusterAnalysisDriver extends Driver {
 
     private AIDA aida = AIDA.defaultInstance();
 
-    public void process(EventHeader event) {
+    public void process(EventHeader event) {            
         if (event.hasCollection(Cluster.class, "EcalClustersCorr")) {
             List<Cluster> clusters = event.get(Cluster.class, "EcalClustersCorr");
             aida.histogram1D("Number of Clusters in Event", 10, 0., 10.).fill(clusters.size());
@@ -26,16 +26,20 @@ public class EcalClusterAnalysisDriver extends Driver {
             List<Double> energies = new ArrayList<Double>();
             List<Boolean> isFiducial = new ArrayList<Boolean>();
             List<Boolean> isTop = new ArrayList<Boolean>();
+            double[] cPos;
             for (Cluster cluster : clusters) {
                 if (cluster.getEnergy() > maxEnergy) {
                     maxEnergy = cluster.getEnergy();
                 }
-                double[] cPos = cluster.getPosition();
+                cPos = cluster.getPosition();
                 times.add(ClusterUtilities.findSeedHit(cluster).getTime());
                 energies.add(cluster.getEnergy());
                 isFiducial.add(TriggerModule.inFiducialRegion(cluster));
                 isTop.add(cluster.getPosition()[1] > 0.);
                 aida.histogram2D("cluster x vs y", 320, -270.0, 370.0, 90, -90.0, 90.0).fill(cPos[0], cPos[1]);
+                aida.histogram2D("cluster pos vs time", 320, -270.0, 370.0, 90, -90.0, 90.0).fill(cPos[0], cPos[1],ClusterUtilities.findSeedHit(cluster).getTime());
+                aida.histogram2D("cluster x vs time", 320, -270.0, 370.0, 100, -5, 5.).fill(cPos[0], ClusterUtilities.findSeedHit(cluster).getTime());
+                aida.histogram2D("cluster y vs time", 90, -90.0, 90.0, 100, -5, 5.).fill(cPos[1], ClusterUtilities.findSeedHit(cluster).getTime());
                 String half = cluster.getPosition()[1] > 0. ? "Top ": "Bottom ";
                 aida.histogram1D(half+"Cluster Energy", 100, 0., 6.).fill(cluster.getEnergy());
             }
@@ -43,6 +47,7 @@ public class EcalClusterAnalysisDriver extends Driver {
                 double e0 = energies.get(0);
                 double e1 = energies.get(1);
                 double esum = e0 + e1;
+                //aida.histogram2D("sum", 320, -270.0, 370.0, 90, -90.0, 90.0).fill(e0, e1, esum);
                 aida.histogram1D("Two-Cluster Energy sum", 100, 0., 6.).fill(energies.get(0) + energies.get(1));
                 aida.histogram1D("Two-Cluster time difference", 100, -5, 5.).fill(times.get(0) - times.get(1));
                 boolean isTopBottom = false;
@@ -50,12 +55,12 @@ public class EcalClusterAnalysisDriver extends Driver {
                     isTopBottom = true;
                     aida.histogram1D("Two-Cluster Energy sum top-bottom", 100, 0., 6.).fill(energies.get(0) + energies.get(1));
                     aida.histogram1D("Two-Cluster time difference top-bottom", 100, -5, 5.).fill(times.get(0) - times.get(1));
+                    aida.histogram2D("energy", 100, -5, 5.,100, 0., 6.).fill(times.get(0) - times.get(1),energies.get(0) + energies.get(1));
                 }
                 if (!isTop.get(0) && isTop.get(1)) {
                     isTopBottom = true;
                     aida.histogram1D("Two-Cluster time difference top-bottom", 100, -5, 5.).fill(times.get(1) - times.get(0));
                     aida.histogram1D("Two-Cluster Energy sum top-bottom", 100, 0., 6.).fill(energies.get(0) + energies.get(1));
-
                 }
                 if (isTop.get(0) && isTop.get(1)) {
                     aida.histogram1D("Two-Cluster time difference top-top", 100, -5, 5.).fill(times.get(0) - times.get(1));
