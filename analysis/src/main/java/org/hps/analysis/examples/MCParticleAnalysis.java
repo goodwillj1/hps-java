@@ -21,41 +21,33 @@ import org.lcsim.event.*;
 */
 public class MCParticleAnalysis extends Driver {
     
-    private AIDA aida = AIDA.defaultInstance();
+    private final AIDA aida = AIDA.defaultInstance();
     
-    public void process(EventHeader event) {
-        //setupSensors(event);
+    public void process(final EventHeader event) {
+        // setupSensors(event);
         analyzeMC(event);
-        //analyzeV0(event);
+        // analyzeV0(event);
     }
     
-    private void analyzeMC(EventHeader event) {
-        //List<MCParticle> mcList = event.get(MCParticle.class, "MCParticle");
-        List<SimCalorimeterHit> calHits = event.get(SimCalorimeterHit.class, "EcalHits");
-        List<SimTrackerHit> trackHits = event.get(SimTrackerHit.class, "TrackerHitsECal");
+    private void analyzeMC(final EventHeader event) {
+        // List<MCParticle> mcList = event.get(MCParticle.class, "MCParticle");
+        final List<SimCalorimeterHit> calHits = event.get(SimCalorimeterHit.class, "EcalHits");
+        final List<SimTrackerHit> trackHits = event.get(SimTrackerHit.class, "TrackerHitsECal");
         int pdgId;
         String id;
-        for (SimTrackerHit trckHits : trackHits) {
-            MCParticle mc = trckHits.getMCParticle();
+        for (final SimTrackerHit trckHits : trackHits) {
+            final MCParticle mc = trckHits.getMCParticle();
             pdgId = mc.getPDGID();
-            
-            //System.out.println("prod = " + mc.getProductionTime());
             if (pdgId == 13) {
-                if (event.hasCollection(SimCalorimeterHit.class, "EcalHits") && event.hasCollection(SimTrackerHit.class, "TrackerHitsECal")) {
-                    id= mc.getType().getName();
-                    //System.out.println("zorigin " + mc.getOriginZ());
-                    if(mc.getOriginZ() == -7.5){
-                        //System.out.println("zorigin " + mc.getOriginZ());
-                        aida.histogram1D(id + "/ZOrigin", 100, -10., -5.).fill(mc.getOriginZ());
-                        aida.histogram2D(id + "/xVsyScore", 100, -5., 5., 100, -5., 5.).fill(mc.getOriginX(),mc.getOriginY());
-                        //aida.histogram2D(id + "/TimeVsScorePos",100, -0.1,0.1,200,-10.,10.).fill(mc.getProductionTime(),mc.getOriginZ());
-                        for(SimCalorimeterHit cHits : calHits){
-                            MCParticle cMc = cHits.getMCParticle(0);
-                            aida.histogram2D(id + "/xVsyECal", 320, -270.0, 370.0, 90, -90.0, 90.0).fill(cMc.getOriginX(),cMc.getOriginY());
-                            if(cMc.getOriginZ() == -7.5){
-                                aida.histogram2D(id + "/DelxVsDelY", 100,-2.,2.,100,-2.,2.).fill(mc.getOriginX()-cMc.getOriginX(),mc.getOriginY()-cMc.getOriginY());
-                            }
-                            aida.histogram2D(id + "/TimeVsDelZ",100, -0.1,0.1,200,-10.,10.).fill(mc.getProductionTime(),mc.getOriginZ()-cMc.getOriginZ());
+                id = mc.getType().getName();
+                if (Math.abs(mc.getOriginZ()) == 7.5) {
+                    aida.histogram1D(id + "/ZOrigin", 100, -10., -5.).fill(mc.getOriginZ());
+                    aida.histogram2D(id + "/xVsyScore", 320, -270.0, 370.0, 90, -90.0, 90.0).fill(trckHits.getPositionVec().x(), trckHits.getPositionVec().y());
+                    for (final SimCalorimeterHit cHits : calHits) {
+                        if (mc.equals(cHits.getMCParticle(0))){
+                            aida.histogram2D(id + "/xVsyECal", 320, -270.0, 370.0, 90, -90.0, 90.0).fill(cHits.getPositionVec().x(),cHits.getPositionVec().y());
+                            aida.histogram2D(id + "/DelxVsDelY", 200,-100.,100.,200,-100.,100.).fill(Math.abs(trckHits.getPositionVec().x())-Math.abs(cHits.getPositionVec().x()),Math.abs(trckHits.getPositionVec().y())-Math.abs(cHits.getPositionVec().y()));
+                            aida.histogram2D(id + "/TimeVsDelMag",100, 0. ,10., 200, 0., 200.).fill(cHits.getTime(),Math.abs(cHits.getPositionVec().magnitude())-Math.abs(trckHits.getPositionVec().magnitude()));
                         }
                     }
                 }
