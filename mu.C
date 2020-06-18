@@ -19,52 +19,96 @@
 using namespace std;
 
 
-void mu() {
+void mu2(int pdgId) {
     TFile *MyFile = new TFile("out.root","READ");
-
-
-    TString hname ="mu-";
+    TString hname;
+    if(pdgId == 13){
+        hname ="mu-";
+    }
+    if(pdgId == -13){
+        hname ="mu+";
+    }
     TKey *key = MyFile->FindKey(hname);
     TH1 *OriginZ = (TH1*)MyFile->Get(hname + "/ZOrigin");
     TH1 *xyScore = (TH1*)MyFile->Get(hname + "/xVsyScore");
     TH1 *xyECal = (TH1*)MyFile->Get(hname + "/xVsyECal");
     TH1 *dxdy = (TH1*)MyFile->Get(hname +"/DelxVsDelY");
     TH1 *tdxdy = (TH1*)MyFile->Get(hname +"/TimeVsDelMag");
-    TCanvas *c1 = new TCanvas("c1","mu-",1000,1000);
+    TH1 *xyLowEn = (TH1*)MyFile->Get(hname +"/X vs Y Score < 0.1 GeV");
+    
+    TCanvas *c1 = new TCanvas("c1",hname,1000,1000);
     c1->Divide(2,3);
     c1->cd(1);
+    OriginZ->GetXaxis()->SetTitle("Z (mm)");
     OriginZ->Draw();
     c1->cd(2);
+    xyScore->SetTitle("X Vs. Y Score Hits");
+    xyScore->GetXaxis()->SetTitle("X (mm)");
+    xyScore->GetYaxis()->SetTitle("Y (mm)");
     xyScore->Draw("COLZ");
     c1->cd(3);
+    xyECal->SetTitle("X Vs. Y ECal Hits");
+    xyECal->GetXaxis()->SetTitle("X (mm)");
+    xyECal->GetYaxis()->SetTitle("Y (mm)");
     xyECal->Draw("COLZ");
     c1->cd(4);
+    dxdy->SetTitle("Delta X vs Delta Y (TrackHits - ECalHits)");
+    dxdy->GetXaxis()->SetTitle("dX (mm)");
+    dxdy->GetYaxis()->SetTitle("dY (mm)");
     dxdy->Draw("COLZ");
     c1->cd(5);
+    tdxdy->SetTitle("time vs distance");
+    tdxdy->GetXaxis()->SetTitle("dX (mm)");
+    tdxdy->GetYaxis()->SetTitle("dY (mm)");
     tdxdy->Draw("COLZ");
-    c1->Print("mu-.pdf(","pdf");
+    c1->cd(6);
+    xyLowEn->SetTitle("X vs Energy < 0.1 GeV");
+    xyLowEn->GetXaxis()->SetTitle("X (mm)");
+    xyLowEn->GetYaxis()->SetTitle("Y (mm)");
+    xyLowEn->Draw("COLZ");
+    c1->Print(hname + ".pdf(","pdf");
 
     TH1 *thetaX = (TH1*)MyFile->Get(hname +"/thetaX");
     TH1 *thetaY = (TH1*)MyFile->Get(hname +"/thetaY");
-    TH1 *energy = (TH1*)MyFile->Get(hname +"/energy");
+    TH1 *corrEnergy = (TH1*)MyFile->Get(hname +"/corrEnergy");
+    TH1 *contEnergy = (TH1*)MyFile->Get(hname +"/contEnergy");
     TH1 *momentum = (TH1*)MyFile->Get(hname +"/momentum");
     TH1 *numHits = (TH1*)MyFile->Get(hname +"/numHits");
+    TH1 *Xen = (TH1*)MyFile->Get(hname +"/xVsen");
 
-    c1 = new TCanvas("c1","mu-",1000,1000);
+
+    c1 = new TCanvas("c1",hname,1000,1000);
     c1->Divide(2,3);
     c1->cd(1);
+    thetaX->SetTitle("theta X");
+    thetaX->GetXaxis()->SetTitle("Degrees (rad)");
     thetaX->Draw();
     c1->cd(2);
+    thetaY->SetTitle("theta Y");
+    thetaY->GetXaxis()->SetTitle("Degrees (rad)");
     thetaY->Draw();
     c1->cd(3);
-    energy->Draw();
+    corrEnergy->SetTitle("Energy Corrected and Contributed");
+    corrEnergy->GetXaxis()->SetTitle("Energy (GeV)");
+    corrEnergy->Draw();
+    contEnergy->Draw("SAME");
     c1->cd(4);
+    momentum->SetTitle("Particle Momentum");
+    momentum->GetXaxis()->SetTitle("Momentum (GeV)");
     momentum->Draw();
     c1->cd(5);
+    numHits->SetTitle("Number of Hits Per Cluster");
+    numHits->GetXaxis()->SetTitle("Number of Hits");
     numHits->Draw();
-    c1->Print("mu-.pdf)","pdf");
-
-
+    c1->cd(6);
+    Xen->SetTitle("X vs Energy");
+    Xen->GetXaxis()->SetTitle("X (mm)");
+    Xen->GetYaxis()->SetTitle("Energy (GeV)");
+    Xen->Draw();
+    c1->Print(hname + ".pdf)","pdf");
+    c1->Close();
+    MyFile->Close();
+/*
     hname = "mu+";
     OriginZ = (TH1*)MyFile->Get(hname + "/ZOrigin");
     xyScore = (TH1*)MyFile->Get(hname + "/xVsyScore");
@@ -90,9 +134,13 @@ void mu() {
 
     thetaX = (TH1*)MyFile->Get(hname +"/thetaX");
     thetaY = (TH1*)MyFile->Get(hname +"/thetaY");
-    energy = (TH1*)MyFile->Get(hname +"/energy");
+    corrEnergy = (TH1*)MyFile->Get(hname +"/corrEnergy");
+    contEnergy = (TH1*)MyFile->Get(hname +"/contEnergy");
     momentum = (TH1*)MyFile->Get(hname +"/momentum");
     numHits = (TH1*)MyFile->Get(hname +"/numHits");
+
+    corrEnergy->SetLineColor(kRed);
+    contEnergy->SetLineColor(kBlue);
 
     c1 = new TCanvas("c1","mu+",1000,1000);
     c1->Divide(2,3);
@@ -101,10 +149,21 @@ void mu() {
     c1->cd(2);
     thetaY->Draw();
     c1->cd(3);
-    energy->Draw();
+    corrEnergy->SetTitle("Energy");
+    corrEnergy->Draw();
+    contEnergy->Draw("SAME");
     c1->cd(4);
     momentum->Draw();
     c1->cd(5);
     numHits->Draw();
     c1->Print("mu+.pdf)","pdf");
+    */
+}
+
+int mu(){
+    int pdgId = 13;
+    mu2(pdgId);
+    pdgId = -13;
+    mu2(pdgId);
+    return 0;
 }
