@@ -29,7 +29,8 @@ void mu2(int pdgId) {
         hname ="mu+";
     }
     TKey *key = MyFile->FindKey(hname);
-    TH1 *OriginZ = (TH1*)MyFile->Get(hname + "/ZOrigin");
+    //TH1 *OriginZ = (TH1*)MyFile->Get(hname + "/ZOrigin");
+    TH1 *hitCount = (TH1*)MyFile->Get(hname + "/corrEnergy1");
     TH1 *xyScore = (TH1*)MyFile->Get(hname + "/xVsyScore");
     TH1 *xyECal = (TH1*)MyFile->Get(hname + "/xVsyECal");
     TH1 *dxdy = (TH1*)MyFile->Get(hname +"/DelxVsDelY");
@@ -39,8 +40,15 @@ void mu2(int pdgId) {
     TCanvas *c1 = new TCanvas("c1",hname,1000,1000);
     c1->Divide(2,3);
     c1->cd(1);
-    OriginZ->GetXaxis()->SetTitle("Z (mm)");
-    OriginZ->Draw();
+    hitCount->SetTitle("Number of Hits per Particle");
+    hitCount->GetXaxis()->SetTitle("Number of Hits");
+    hitCount->GetXaxis()->SetRangeUser(0., 10.);
+    hitCount->GetYaxis()->SetRangeUser(0., 15000.);
+    hitCount->Draw();
+    for (int i =1; i < 6; i ++){
+        hitCount = (TH1*)MyFile->Get(hname + "/corrEnergy" + i);
+        hitCount->Draw("SAME");
+    }
     c1->cd(2);
     xyScore->SetTitle("X Vs. Y Score Hits");
     xyScore->GetXaxis()->SetTitle("X (mm)");
@@ -97,14 +105,14 @@ void mu2(int pdgId) {
     momentum->GetXaxis()->SetTitle("Momentum (GeV)");
     momentum->Draw();
     c1->cd(5);
-    numHits->SetTitle("Number of Hits Per Cluster");
+    numHits->SetTitle("Number of Hits Per Particle");
     numHits->GetXaxis()->SetTitle("Number of Hits");
     numHits->Draw();
     c1->cd(6);
     Xen->SetTitle("X vs Energy");
     Xen->GetXaxis()->SetTitle("X (mm)");
     Xen->GetYaxis()->SetTitle("Energy (GeV)");
-    Xen->Draw();
+    Xen->Draw("COLZ");
     c1->Print(hname + ".pdf)","pdf");
     c1->Close();
     MyFile->Close();
