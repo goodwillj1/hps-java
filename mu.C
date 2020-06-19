@@ -16,6 +16,7 @@
 #include <TBenchmark.h>
 #include <TInterpreter.h>
 #include <iostream>
+#include <string>
 using namespace std;
 
 
@@ -40,18 +41,42 @@ void mu2(int pdgId) {
     TCanvas *c1 = new TCanvas("c1",hname,1000,1000);
     c1->Divide(2,3);
     c1->cd(1);
-    hitCount->SetTitle("Number of Hits per Particle");
-    hitCount->GetXaxis()->SetTitle("Number of Hits");
-    hitCount->GetXaxis()->SetRangeUser(0., 10.);
-    hitCount->GetYaxis()->SetRangeUser(0., 15000.);
+    hitCount->SetTitle(" ");
+    hitCount->GetXaxis()->SetTitle("Energy (GeV)");
+    hitCount->GetXaxis()->SetTitleSize(0.050);
+    hitCount->GetXaxis()->SetRangeUser(0.05, 0.25);
+    //hitCount->GetYaxis()->SetRangeUser(0., 15000.);
+    TLegend *leg = new TLegend(0.1,0.7,0.48,0.9);
+    leg->SetHeader("Number of Hits","C");
+    leg->AddEntry(hitCount,"1","l");
     hitCount->Draw();
-    for (int i =1; i < 6; i ++){
+    for (int i = 2; i < 6; i ++){
         hitCount = (TH1*)MyFile->Get(hname + "/corrEnergy" + i);
-        hitCount->Draw("SAME");
+        if(i == 2){
+            //n = "Count " + (const char*)i;
+            hitCount->SetLineColor(2);
+            leg->AddEntry(hitCount, "2" ,"l");
+        }
+        else if(i == 3){
+            hitCount->SetLineColor(3);
+            leg->AddEntry(hitCount,"3" ,"l");
+        }
+        else if(i == 4){
+            hitCount->SetLineColor(4);
+            leg->AddEntry(hitCount,"4" ,"l");
+        }
+        else if(i == 5){
+            hitCount->SetLineColor(5);
+            leg->AddEntry(hitCount,"5" ,"l");
+        }
+        leg->Draw();
+        hitCount->Draw("SAMES");
     }
     c1->cd(2);
     xyScore->SetTitle("X Vs. Y Score Hits");
     xyScore->GetXaxis()->SetTitle("X (mm)");
+    xyScore->GetXaxis()->SetTitleSize(0.053);
+    xyScore->GetYaxis()->SetTitleSize(0.053);
     xyScore->GetYaxis()->SetTitle("Y (mm)");
     xyScore->Draw("COLZ");
     c1->cd(3);
@@ -79,7 +104,7 @@ void mu2(int pdgId) {
     TH1 *thetaX = (TH1*)MyFile->Get(hname +"/thetaX");
     TH1 *thetaY = (TH1*)MyFile->Get(hname +"/thetaY");
     TH1 *corrEnergy = (TH1*)MyFile->Get(hname +"/corrEnergy");
-    TH1 *contEnergy = (TH1*)MyFile->Get(hname +"/contEnergy");
+    //TH1 *contEnergy = (TH1*)MyFile->Get(hname +"/contEnergy");
     TH1 *momentum = (TH1*)MyFile->Get(hname +"/momentum");
     TH1 *numHits = (TH1*)MyFile->Get(hname +"/numHits");
     TH1 *Xen = (TH1*)MyFile->Get(hname +"/xVsen");
@@ -96,10 +121,12 @@ void mu2(int pdgId) {
     thetaY->GetXaxis()->SetTitle("Degrees (rad)");
     thetaY->Draw();
     c1->cd(3);
-    corrEnergy->SetTitle("Energy Corrected and Contributed");
+    corrEnergy->SetTitle("Energy Corrected");
+    //corrEnergy->GetXaxis()->SetRangeUser(0.05 , 0.3);
     corrEnergy->GetXaxis()->SetTitle("Energy (GeV)");
+    corrEnergy->GetXaxis()->SetTitleSize(0.048);
     corrEnergy->Draw();
-    contEnergy->Draw("SAME");
+    //contEnergy->Draw("SAME");
     c1->cd(4);
     momentum->SetTitle("Particle Momentum");
     momentum->GetXaxis()->SetTitle("Momentum (GeV)");
@@ -114,6 +141,7 @@ void mu2(int pdgId) {
     Xen->GetYaxis()->SetTitle("Energy (GeV)");
     Xen->Draw("COLZ");
     c1->Print(hname + ".pdf)","pdf");
+    c1->SaveAs( "muon.C");
     c1->Close();
     MyFile->Close();
 /*
