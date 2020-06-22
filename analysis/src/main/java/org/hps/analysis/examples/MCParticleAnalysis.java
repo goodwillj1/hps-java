@@ -73,8 +73,9 @@ public class MCParticleAnalysis extends Driver {
                             aida.histogram2D(id + "/TimeVsDelMag",100, 0. ,10., 200, 0., 200.).fill(cHits.getTime(),Math.sqrt(Math.pow(delx, 2) + Math.pow(dely, 2)));
                             if(cHits.getCorrectedEnergy() < 0.1){
                                 aida.histogram2D(id + "/X vs Y Score < 0.1 GeV", 800, -400.0, 400.0, 300, -150.0, 150.0).fill(trckHits.getPositionVec().x(), trckHits.getPositionVec().y());
+                            }
+                            if(cHits.getCorrectedEnergy() > 0.02){
                                 aida.histogram2D(id + "/xVsen",  320, -270.0, 370.0, 100, 0., 0.3).fill(trckHits.getPositionVec().x(), cHits.getContributedEnergy(0));
-                                
                             }
                             if(cHits.getCorrectedEnergy() > 0.05) {
                                 aida.histogram1D(id + "/corrEnergy", 100, 0., 0.3).fill(cHits.getCorrectedEnergy());
