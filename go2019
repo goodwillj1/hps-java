@@ -1,3 +1,3 @@
 mvn install -DskipTests=true
 
-java -jar distribution/target/hps-distribution-4.5-SNAPSHOT-bin.jar -r /org/hps/steering/analysis/TrackPlotAnalysis.lcsim -d HPS-PhysicsRun2019-v1-4pt5 -R 10651 -i /home/goodwill/hps2019/data/muonSkim/hps_010650.evio.015_muonSkim_4.evio_skimMuMu.slcio -DoutputFile=out 
+java -jar distribution/target/hps-distribution-4.5-SNAPSHOT-bin.jar -r /org/hps/steering/analysis/DataMuonAnalysis.lcsim -d HPS-PhysicsRun2019-v1-4pt5 -R 10651 -i /home/goodwill/hps2019/data/muonSkim/hps_010650.evio.015_muonSkim_4.evio_skimMuMu.slcio -DoutputFile=out 

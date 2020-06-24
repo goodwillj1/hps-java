@@ -37,7 +37,8 @@ void mu2(int pdgId) {
     TH1 *dxdy = (TH1*)MyFile->Get(hname +"/DelxVsDelY");
     TH1 *tdxdy = (TH1*)MyFile->Get(hname +"/TimeVsDelMag");
     TH1 *xyLowEn = (TH1*)MyFile->Get(hname +"/X vs Y Score < 0.1 GeV");
-    
+    TH1 *sumHit = (TH1*)MyFile->Get(hname + "/sumHits1");
+    TH1 *oneHitXvsEn = (TH1*)MyFile->Get(hname + "/1HitXvsEn");
     TCanvas *c1 = new TCanvas("c1",hname,1000,1000);
     c1->Divide(2,3);
     c1->cd(1);
@@ -72,6 +73,7 @@ void mu2(int pdgId) {
         leg->Draw();
         hitCount->Draw("SAMES");
     }
+    leg->Clear();
     c1->cd(2);
     xyScore->SetTitle("X Vs. Y Score Hits");
     xyScore->GetXaxis()->SetTitle("X (mm)");
@@ -80,20 +82,60 @@ void mu2(int pdgId) {
     xyScore->GetYaxis()->SetTitle("Y (mm)");
     xyScore->Draw("COLZ");
     c1->cd(3);
+    sumHit->SetTitle("Sum of Hits");
+    sumHit->GetXaxis()->SetTitle("Energy (GeV)");
+    sumHit->GetXaxis()->SetTitleSize(0.050);
+    leg->SetHeader("Number of Hits","C");
+    leg->AddEntry(sumHit,"1","l");
+    sumHit->GetYaxis()->SetRangeUser(0., 1000.);
+    sumHit->Draw();
+    for (int i = 2; i < 6; i ++){
+        sumHit = (TH1*)MyFile->Get(hname + "/sumHits" + i);
+        if(i == 2){
+            //n = "Count " + (const char*)i;
+            sumHit->SetLineColor(2);
+            leg->AddEntry(sumHit, "2" ,"l");
+        }
+        else if(i == 3){
+            sumHit->SetLineColor(3);
+            leg->AddEntry(sumHit,"3" ,"l");
+        }
+        else if(i == 4){
+            sumHit->SetLineColor(4);
+            leg->AddEntry(sumHit,"4" ,"l");
+        }
+        else if(i == 5){
+            sumHit->SetLineColor(5);
+            leg->AddEntry(sumHit,"5" ,"l");
+        }
+        leg->Draw();
+        sumHit->Draw("SAMES");   
+    }
+    //leg->Clear();
+    /*
     xyECal->SetTitle("X Vs. Y ECal Hits");
     xyECal->GetXaxis()->SetTitle("X (mm)");
     xyECal->GetYaxis()->SetTitle("Y (mm)");
     xyECal->Draw("COLZ");
+    */
     c1->cd(4);
     dxdy->SetTitle("Delta X vs Delta Y (TrackHits - ECalHits)");
     dxdy->GetXaxis()->SetTitle("dX (mm)");
     dxdy->GetYaxis()->SetTitle("dY (mm)");
     dxdy->Draw("COLZ");
     c1->cd(5);
+    oneHitXvsEn->SetTitle("X vs Energy for 1-Hit Particles");
+    oneHitXvsEn->GetXaxis()->SetTitle("X (mm)");
+    oneHitXvsEn->GetYaxis()->SetTitle("Energy (GeV)");
+    oneHitXvsEn->Draw("COLZ");
+
+
+    /*
     tdxdy->SetTitle("time vs distance");
     tdxdy->GetXaxis()->SetTitle("dX (mm)");
     tdxdy->GetYaxis()->SetTitle("dY (mm)");
     tdxdy->Draw("COLZ");
+    */
     c1->cd(6);
     xyLowEn->SetTitle("X vs Energy < 0.1 GeV");
     xyLowEn->GetXaxis()->SetTitle("X (mm)");

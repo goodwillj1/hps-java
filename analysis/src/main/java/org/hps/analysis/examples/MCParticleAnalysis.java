@@ -38,7 +38,6 @@ public class MCParticleAnalysis extends Driver {
         double thetaX;
         double delx;
         double dely;
-
         for (final SimTrackerHit trckHits : trackHits) {
 
             final MCParticle mc = trckHits.getMCParticle();
@@ -52,11 +51,12 @@ public class MCParticleAnalysis extends Driver {
                     aida.histogram2D(id + "/xVsyScore", 800, -400.0, 400.0, 300, -150.0, 150.0).fill(trckHits.getPositionVec().x(), trckHits.getPositionVec().y());
 
                     int hitCount=0;
+                    double sumEnergy = 0;
                     for (final SimCalorimeterHit cHits : calHits) {
                         if (trckHits.getMCParticle() == cHits.getMCParticle(0)){
 
                             hitCount++;
-
+                            sumEnergy += cHits.getContributedEnergy(0);
                             thetaY = atan2(cHits.getMCParticle(0).getMomentum().y(), cHits.getMCParticle(0).getMomentum().z());
                             thetaX = atan2(cHits.getMCParticle(0).getMomentum().x(), cHits.getMCParticle(0).getMomentum().z());
                             aida.histogram1D(id + "/momentum", 100, 0., 2.).fill(cHits.getMCParticle(0).getMomentum().magnitude());
@@ -84,13 +84,16 @@ public class MCParticleAnalysis extends Driver {
                     }
                     aida.histogram1D(id + "/numHits",20, 0., 20.).fill(hitCount);
 
-
                     if (hitCount>0 && hitCount<6) {
                         for (final SimCalorimeterHit cHits : calHits) {
                             if (trckHits.getMCParticle() == cHits.getMCParticle(0)){
+                                if(hitCount == 1){
+                                    aida.histogram2D(id + "/1HitXvsEn",  320, -270.0, 370.0, 100, 0., 0.3).fill(trckHits.getPositionVec().x(), cHits.getContributedEnergy(0));
+                                }
                                 if(cHits.getCorrectedEnergy() > 0.01){
                                     aida.histogram1D(id+"/corrEnergy"+hitCount,100, 0., 0.3).fill(cHits.getContributedEnergy(0));
                                 }
+                                aida.histogram1D(id+"/sumHits"+hitCount,100, 0., 0.3).fill(sumEnergy);
                             }
                         }
                     }
