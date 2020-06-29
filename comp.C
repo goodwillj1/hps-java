@@ -39,6 +39,7 @@ void mu2(int pdgId) {
     TH1 *hits = (TH1*)data->Get(hname + "/hits");
     TH1 *xEn = (TH1*)data->Get(hname + "/XEn");
     TH1 *dxdy = (TH1*)data->Get(hname + "/delXdelY");
+    TH1 *enMom = (TH1*)data->Get(hname + "/EnergyVsmom");
     TCanvas *c1 = new TCanvas("c1",hname,1000,1000);
     c1->Divide(2,3);
     c1->cd(1);
@@ -49,6 +50,7 @@ void mu2(int pdgId) {
     energy->Draw();
     c1->cd(5);
     mom->SetTitle("momentum");
+    //mom->GetXaxis()->SetRangeUser(0., 3.);
     mom->Draw();
 
 
@@ -93,6 +95,8 @@ void mu2(int pdgId) {
     xEn->Draw("COLZ");
     c1->Print(hname + "Comp.pdf","pdf");
     c1->Clear();
+
+
     c1->Divide(2,3);
     c1->cd(1);
     hits->SetTitle("hits");
@@ -100,9 +104,13 @@ void mu2(int pdgId) {
     c1->cd(3);
     dxdy->SetTitle("Delta X vs Delta Y");
     dxdy->Draw("COLZ");
+    c1->cd(5);
+    enMom->SetTitle("Energy Vs Momentum");
+    enMom->Draw("COLZ");
 
     hits = (TH1*)mc->Get(hname + "/hits");
     dxdy = (TH1*)mc->Get(hname + "/delXdelY");
+    enMom = (TH1*)mc->Get(hname + "/EnergyVsmom");
 
     c1->cd(2);
     hits->SetTitle("hits");
@@ -110,6 +118,9 @@ void mu2(int pdgId) {
     c1->cd(4);
     dxdy->SetTitle("Delta X vs Delta Y");
     dxdy->Draw("COLZ");
+    c1->cd(6);
+    enMom->SetTitle("Energy Vs Momentum");
+    enMom->Draw("COLZ");
     c1->Print(hname + "Comp.pdf)","pdf");
 
 
