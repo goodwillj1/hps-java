@@ -48,7 +48,7 @@ public class MCParticleAnalysis extends Driver {
 
 
                     aida.histogram1D(id + "/ZOrigin", 100, -10., -5.).fill(mc.getOriginZ());
-                    aida.histogram2D(id + "/xVsyScore", 800, -400.0, 400.0, 300, -150.0, 150.0).fill(trckHits.getPositionVec().x(), trckHits.getPositionVec().y());
+                    aida.histogram2D(id + "/XYECal", 800, -400.0, 400.0, 300, -150.0, 150.0).fill(trckHits.getPositionVec().x(), trckHits.getPositionVec().y());
 
                     int hitCount=0;
                     double sumEnergy = 0;
@@ -64,25 +64,25 @@ public class MCParticleAnalysis extends Driver {
                             //aida.histogram2D(id + "/xVsen",  320, -270.0, 370.0, 100, 0., 0.3).fill(trckHits.getPositionVec().x(), cHits.getContributedEnergy(0));
                             aida.histogram1D(id + "/thetaY", 100, -0.1, 0.1).fill(thetaY);
                             aida.histogram1D(id + "/thetaX", 100, -0.4, 0.4).fill(thetaX);
-                            aida.histogram2D(id + "/xVsyECal", 800, -400.0, 400.0, 300, -150.0, 150.0).fill(cHits.getPositionVec().x(),cHits.getPositionVec().y());
+                            //aida.histogram2D(id + "/XYECal", 800, -400.0, 400.0, 300, -150.0, 150.0).fill(cHits.getPositionVec().x(),cHits.getPositionVec().y());
                             delx = Math.abs(trckHits.getPositionVec().x())-Math.abs(cHits.getPositionVec().x());
                             dely = Math.abs(trckHits.getPositionVec().y())-Math.abs(cHits.getPositionVec().y());
                             if(Math.abs(dely) < 50){
-                                aida.histogram2D(id + "/DelxVsDelY", 200,-100.,100.,200,-50.,50.).fill(delx,dely);
+                                aida.histogram2D(id + "/delXdelY", 200,-100.,100.,200,-50.,50.).fill(delx,dely);
                             }
                             aida.histogram2D(id + "/TimeVsDelMag",100, 0. ,10., 200, 0., 200.).fill(cHits.getTime(),Math.sqrt(Math.pow(delx, 2) + Math.pow(dely, 2)));
                             if(cHits.getCorrectedEnergy() < 0.1){
                                 aida.histogram2D(id + "/X vs Y Score < 0.1 GeV", 800, -400.0, 400.0, 300, -150.0, 150.0).fill(trckHits.getPositionVec().x(), trckHits.getPositionVec().y());
                             }
                             if(cHits.getCorrectedEnergy() > 0.02){
-                                aida.histogram2D(id + "/xVsen",  320, -270.0, 370.0, 100, 0., 0.3).fill(trckHits.getPositionVec().x(), cHits.getContributedEnergy(0));
+                                aida.histogram2D(id + "/XEn",  320, -270.0, 370.0, 100, 0., 0.3).fill(trckHits.getPositionVec().x(), cHits.getContributedEnergy(0));
                             }
                             if(cHits.getCorrectedEnergy() > 0.05) {
-                                aida.histogram1D(id + "/corrEnergy", 100, 0., 0.3).fill(cHits.getCorrectedEnergy());
+                                aida.histogram1D(id + "/energy", 100, 0., 0.3).fill(cHits.getCorrectedEnergy());
                             }
                         }
                     }
-                    aida.histogram1D(id + "/numHits",20, 0., 20.).fill(hitCount);
+                    aida.histogram1D(id + "/hits",20, 0., 20.).fill(hitCount);
 
                     if (hitCount>0 && hitCount<6) {
                         for (final SimCalorimeterHit cHits : calHits) {
