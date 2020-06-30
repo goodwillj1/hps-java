@@ -54,7 +54,7 @@ public class DataMuonAnalysis extends Driver {
         double thetaX = 0;
         Hep3Vector pmom = null;
         int pdgId;
-        double sumEnergy = 0;
+        //double sumEnergy = 0;
         for (ReconstructedParticle rp : rpList) {
             pmom = rp.getMomentum();
             thetaY = atan2(pmom.y(), pmom.z());//asin(pmom.y() / pmom.magnitude());
@@ -73,15 +73,15 @@ public class DataMuonAnalysis extends Driver {
                 id = "photon";
                 break;
             }
-            TrackState st2 = TrackUtils.getTrackStateAtECal(t);
+            TrackState st = TrackUtils.getTrackStateAtECal(t);
             if (!clusters.isEmpty()) {
                 Cluster c = clusters.get(0);
                 double[] cPos = c.getPosition();
+                double[] ePos = st.getReferencePoint();
                 aida.histogram1D(id + "/momentum", 100, 0., 2.).fill(pmom.magnitude());
                 aida.histogram1D(id + "/thetaY", 100, -0.1, 0.1).fill(thetaY);
                 aida.histogram1D(id + "/thetaX", 100, -0.4, 0.4).fill(thetaX);
                 aida.histogram1D(id + "/chi2", 100, 0., 100.).fill(t.getChi2());
-                double[] ePos = st2.getReferencePoint();
                 aida.histogram2D(id + "/XYECal",  800, -400.0, 400.0, 300, -150.0, 150.0).fill(ePos[1], ePos[2]);
                 aida.histogram2D(id + "/delXdelY", 200,-100.,100.,200,-50.,50.).fill(ePos[1] - cPos[0], ePos[2] - cPos[1]);
                 aida.histogram1D(id + "/CaltoTrack", 80, 0., 40.).fill(Math.sqrt(Math.pow(ePos[1] - cPos[0], 2) + Math.pow(ePos[2] - cPos[1], 2)));

@@ -40,6 +40,7 @@ void mu2(int pdgId) {
     TH1 *xEn = (TH1*)data->Get(hname + "/XEn");
     TH1 *dxdy = (TH1*)data->Get(hname + "/delXdelY");
     TH1 *enMom = (TH1*)data->Get(hname + "/EnergyVsmom");
+    TH1 *sumHits = (TH1*)data->Get(hname + "/sumHits1");
     TCanvas *c1 = new TCanvas("c1",hname,1000,1000);
     c1->Divide(2,3);
     c1->cd(1);
@@ -121,9 +122,57 @@ void mu2(int pdgId) {
     c1->cd(6);
     enMom->SetTitle("Energy Vs Momentum");
     enMom->Draw("COLZ");
+    c1->Print(hname + "Comp.pdf","pdf");
+
+
+    c1->Clear();
+    c1->Divide(2,3);
+    c1->cd(1);
+    sumHits->SetTitle("Sum of Hit Energies");
+    //sumHits->GetYaxis()->SetRangeUser(0., 3000.);
+    sumHits->Draw();
+    TLegend *leg = new TLegend(0.1,0.7,0.48,0.9);
+    leg->SetHeader("Number of Hits","C");
+    leg->AddEntry(sumHits,"1","l");
+    sumHits->Draw();
+    for (int i = 2; i < 6; i ++){
+        sumHits = (TH1*)data->Get(hname + "/sumHits" + i);
+        if(i == 2){
+            //n = "Count " + (const char*)i;
+            sumHits->SetLineColor(2);
+            leg->AddEntry(sumHits, "2" ,"l");
+        }
+        else if(i == 3){
+            sumHits->SetLineColor(3);
+            leg->AddEntry(sumHits,"3" ,"l");
+        }
+        else if(i == 4){
+            sumHits->SetLineColor(4);
+            leg->AddEntry(sumHits,"4" ,"l");
+        }
+        else if(i == 5){
+            sumHits->SetLineColor(5);
+            leg->AddEntry(sumHits,"5" ,"l");
+        }
+        sumHits->Draw("SAMES");
+    }
+    leg->Draw();
+
+
+    c1->cd(2);
+    TLegend *leg2 = new TLegend(0.1,0.7,0.48,0.9);
+    leg2->SetHeader("Number of Hits","C");
+    sumHits = (TH1*)mc->Get(hname + "/sumHits1");
+    sumHits->SetTitle("Sum of Hit Energies");
+    sumHits->SetLineColor(1);
+    leg2->AddEntry(sumHits, "1" ,"l");
+    sumHits->Draw();
+    sumHits = (TH1*)mc->Get(hname + "/sumHits2");
+    sumHits->SetLineColor(2);
+    leg2->AddEntry(sumHits, "2" ,"l");
+    sumHits->Draw("SAMES");
+    leg2->Draw();
     c1->Print(hname + "Comp.pdf)","pdf");
-
-
 }
 
 
