@@ -44,7 +44,9 @@ void mu2(int pdgId) {
     TH1 *enMom = (TH1*)data->Get(hname + "/EnergyVsmom");
     TH1 *sumEnergy = (TH1*)data->Get(hname + "/sumEnergy1");
     TH1 *enDelThetaX = (TH1*)data->Get(hname + "/enDelThetaX");
-    TF1 *fa1 = new TF1("fa1","TMath::Landau(x,[3],[4])");
+    TF1 *fa1 = new TF1("fa1","[0]+x*[1]+[2]*TMath::Landau(x,[3],[4],1)");
+    fa1->SetParameters(0, 0, 20, 0.17, 0.005, 1);
+    fa1->SetLineColor(1);
     TCanvas *c1 = new TCanvas("c1",hname,1000,1000);
     c1->Divide(2,3);
     c1->cd(1);
