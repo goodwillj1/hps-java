@@ -53,6 +53,8 @@
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/ROOT/RConcurrentHashColl.hxx
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/ROOT/TRWSpinLock.hxx
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/ROOT/TSpinMutex.hxx
+./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TMath.h
+./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TError.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TH1.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TAxis.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TAttAxis.h
@@ -73,6 +75,15 @@
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TH2.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TMatrixFBasefwd.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TMatrixDBasefwd.h
+./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TF1.h
+./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TFormula.h
+./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TMethodCall.h
+./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TInterpreter.h
+./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TInterpreterValue.h
+./comp_C.so: /home/goodwill/root-6.20.04/obj/include/Math/Types.h
+./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TROOT.h
+./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TF1AbsComposition.h
+./comp_C.so: /home/goodwill/root-6.20.04/obj/include/Math/ParamFunctor.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TCanvas.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TPad.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TVirtualPad.h
@@ -83,8 +94,6 @@
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/Buttons.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TQObject.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TVirtualQConnection.h
-./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TInterpreter.h
-./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TInterpreterValue.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TAttBBox2D.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TPoint.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TAttCanvas.h
@@ -95,7 +104,6 @@
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TRint.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TApplication.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TApplicationImp.h
-./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TROOT.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TKey.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TBenchmark.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TStopwatch.h

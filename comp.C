@@ -1,7 +1,9 @@
 #include <TFile.h>
+#include <TMath.h>
 //#include <TNtuple.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TF1.h>
 //#include <TProfile.h>
 #include <TCanvas.h>
 #include <TLegend.h>
@@ -20,8 +22,8 @@
 using namespace std;
 
 void mu2(int pdgId) {
-    TFile *data = new TFile("dataOut.root","READ");
-    TFile *mc = new TFile("mcOut.root","READ");
+    TFile *data = new TFile("dataOutSample.root","READ");
+    TFile *mc = new TFile("mcOutSample.root","READ");
     TString hname;
     if(pdgId == 11){
         hname ="mu-";
@@ -40,7 +42,9 @@ void mu2(int pdgId) {
     TH1 *xEn = (TH1*)data->Get(hname + "/XEn");
     TH1 *dxdy = (TH1*)data->Get(hname + "/delXdelY");
     TH1 *enMom = (TH1*)data->Get(hname + "/EnergyVsmom");
-    TH1 *sumHits = (TH1*)data->Get(hname + "/sumHits1");
+    TH1 *sumEnergy = (TH1*)data->Get(hname + "/sumEnergy1");
+    TH1 *enDelThetaX = (TH1*)data->Get(hname + "/enDelThetaX");
+    TF1 *fa1 = new TF1("fa1","TMath::Landau(x,[3],[4])");
     TCanvas *c1 = new TCanvas("c1",hname,1000,1000);
     c1->Divide(2,3);
     c1->cd(1);
@@ -128,50 +132,85 @@ void mu2(int pdgId) {
     c1->Clear();
     c1->Divide(2,3);
     c1->cd(1);
-    sumHits->SetTitle("Sum of Hit Energies");
-    //sumHits->GetYaxis()->SetRangeUser(0., 3000.);
-    sumHits->Draw();
+    sumEnergy->SetTitle("Sum of Hit Energies");
+    //sumEnergy->GetYaxis()->SetRangeUser(0., 3000.);
+    sumEnergy->Draw();
     TLegend *leg = new TLegend(0.1,0.7,0.48,0.9);
     leg->SetHeader("Number of Hits","C");
-    leg->AddEntry(sumHits,"1","l");
-    sumHits->Draw();
+    leg->AddEntry(sumEnergy,"1","l");
+    sumEnergy->Draw();
     for (int i = 2; i < 6; i ++){
-        sumHits = (TH1*)data->Get(hname + "/sumHits" + i);
+        sumEnergy = (TH1*)data->Get(hname + "/sumEnergy" + i);
         if(i == 2){
             //n = "Count " + (const char*)i;
-            sumHits->SetLineColor(2);
-            leg->AddEntry(sumHits, "2" ,"l");
+            sumEnergy->SetLineColor(2);
+            leg->AddEntry(sumEnergy, "2" ,"l");
         }
         else if(i == 3){
-            sumHits->SetLineColor(3);
-            leg->AddEntry(sumHits,"3" ,"l");
+            sumEnergy->SetLineColor(3);
+            leg->AddEntry(sumEnergy,"3" ,"l");
         }
         else if(i == 4){
-            sumHits->SetLineColor(4);
-            leg->AddEntry(sumHits,"4" ,"l");
+            sumEnergy->SetLineColor(4);
+            leg->AddEntry(sumEnergy,"4" ,"l");
         }
         else if(i == 5){
-            sumHits->SetLineColor(5);
-            leg->AddEntry(sumHits,"5" ,"l");
+            sumEnergy->SetLineColor(5);
+            leg->AddEntry(sumEnergy,"5" ,"l");
         }
-        sumHits->Draw("SAMES");
+        sumEnergy->Draw("SAMES");
     }
     leg->Draw();
 
 
     c1->cd(2);
-    TLegend *leg2 = new TLegend(0.1,0.7,0.48,0.9);
-    leg2->SetHeader("Number of Hits","C");
-    sumHits = (TH1*)mc->Get(hname + "/sumHits1");
-    sumHits->SetTitle("Sum of Hit Energies");
-    sumHits->SetLineColor(1);
-    leg2->AddEntry(sumHits, "1" ,"l");
-    sumHits->Draw();
-    sumHits = (TH1*)mc->Get(hname + "/sumHits2");
-    sumHits->SetLineColor(2);
-    leg2->AddEntry(sumHits, "2" ,"l");
-    sumHits->Draw("SAMES");
-    leg2->Draw();
+    //sumEnergy->GetYaxis()->SetRangeUser(0., 3000.);
+    //sumEnergy->Draw();
+    //TLegend *leg = new TLegend(0.1,0.7,0.48,0.9);
+    //leg->SetHeader("Number of Hits","C");
+    //leg->AddEntry(sumEnergy,"1","l");
+    //sumEnergy->Draw();
+    //sumEnergy = (TH1*)mc->Get(hname + "/sumEnergy1");
+    //sumEnergy->Draw();
+    sumEnergy = (TH1*)mc->Get(hname + "/sumEnergy1");
+    sumEnergy->SetTitle("Sum of Hit Energies");
+    sumEnergy->GetYaxis()->SetRangeUser(0., 700.);
+    sumEnergy->Fit("fa1","R");
+    //fa1->Draw();
+    //sumEnergy->Draw();
+    for (int i = 1; i < 6; i ++){
+        sumEnergy = (TH1*)mc->Get(hname + "/sumEnergy" + i);
+        if(i == 2){
+            //n = "Count " + (const char*)i;
+            sumEnergy->SetLineColor(2);
+            //leg->AddEntry(sumEnergy, "2" ,"l");
+        }
+        else if(i == 3){
+            sumEnergy->SetLineColor(3);
+            //leg->AddEntry(sumEnergy,"3" ,"l");
+        }
+        else if(i == 4){
+            sumEnergy->SetLineColor(4);
+            //leg->AddEntry(sumEnergy,"4" ,"l");
+        }
+        else if(i == 5){
+            sumEnergy->SetLineColor(5);
+            //leg->AddEntry(sumEnergy,"5" ,"l");
+        }
+        sumEnergy->Draw("SAMES");
+    }
+    leg->Draw();
+
+    c1->cd(3);
+    enDelThetaX->SetTitle("Energy vs Delta Theta X");
+    enDelThetaX->Draw("COLZ");
+
+    c1->cd(4);
+    enDelThetaX= (TH1*)mc->Get(hname + "/enDelThetaX");
+    enDelThetaX->SetTitle("Energy vs Delta Theta X");
+    enDelThetaX->Draw("COLZ");
+
+
     c1->Print(hname + "Comp.pdf)","pdf");
 }
 
