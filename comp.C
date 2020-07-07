@@ -44,8 +44,8 @@ void mu2(int pdgId) {
     TH1 *enMom = (TH1*)data->Get(hname + "/EnergyVsmom");
     TH1 *sumEnergy = (TH1*)data->Get(hname + "/sumEnergy1");
     TH1 *enDelThetaX = (TH1*)data->Get(hname + "/enDelThetaX");
-    TF1 *fa1 = new TF1("fa1","[0]+x*[1]+[2]*TMath::Landau(x,[3],[4],1)");
-    fa1->SetParameters(0, 0, 20, 0.17, 0.005, 1);
+    TF1 *fa1 = new TF1("fa1","[0] + [1]*TMath::Landau(x,[2],[3],1)",0.01,0.25);
+    fa1->SetParameters(10, 15, 0.17, 0.004, 1);
     fa1->SetLineColor(1);
     TCanvas *c1 = new TCanvas("c1",hname,1000,1000);
     c1->Divide(2,3);
@@ -177,7 +177,7 @@ void mu2(int pdgId) {
     sumEnergy = (TH1*)mc->Get(hname + "/sumEnergy1");
     sumEnergy->SetTitle("Sum of Hit Energies");
     sumEnergy->GetYaxis()->SetRangeUser(0., 700.);
-    sumEnergy->Fit("fa1","R");
+    sumEnergy->Fit(fa1);
     //fa1->Draw();
     //sumEnergy->Draw();
     for (int i = 1; i < 6; i ++){
@@ -199,7 +199,7 @@ void mu2(int pdgId) {
             sumEnergy->SetLineColor(5);
             //leg->AddEntry(sumEnergy,"5" ,"l");
         }
-        sumEnergy->Draw("SAMES");
+        //sumEnergy->Draw("SAMES");
     }
     leg->Draw();
 

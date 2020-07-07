@@ -86,7 +86,7 @@ public class DataMuonAnalysis extends Driver {
                 //System.out.println("z= " + ePos[0] + " x= " + ePos[1] + " y= " + ePos[2]);
                 if(!Double.isNaN(delThetaX)){
                     //System.out.println(delThetaX);
-                    aida.histogram2D(id + "/enDelThetaX",100, 0., 0.3, 100, -4., 4.).fill(c.getEnergy(), delThetaX);
+                    aida.histogram2D(id + "/enDelThetaX",100, 0., 0.3, 100, -0.5, 0.5).fill(c.getEnergy(), delThetaX);
                 }
                 aida.histogram1D(id + "/tanlam", 100, -2., 2.).fill(tanlam);
                 aida.histogram1D(id + "/momentum", 100, 0., 2.).fill(pmom.magnitude());
@@ -146,11 +146,9 @@ public class DataMuonAnalysis extends Driver {
                                 thetaY = atan2(cHits.getMCParticle(0).getMomentum().y(), cHits.getMCParticle(0).getMomentum().z());
                                 thetaX = atan2(cHits.getMCParticle(0).getMomentum().x(), cHits.getMCParticle(0).getMomentum().z());
                                 ar = trckHits.getMomentum();
-                                //System.out.println("mom = " + ar[0] + " " + ar[1] + " " + ar[2]);
-                                //System.out.println(trckHits.getPositionVec().x());
                                 delThetaX = atan2(trckHits.getPositionVec().x(), 913.);
                                 if(!Double.isNaN(delThetaX)){
-                                    aida.histogram2D(id + "/enDelThetaX",100, 0., 0.3, 100, -4., 4.).fill(cHits.getContributedEnergy(0), delThetaX);
+                                    aida.histogram2D(id + "/enDelThetaX",100, 0., 0.3, 100, -0.5, 0.5).fill(cHits.getContributedEnergy(0), delThetaX);
                                 }
                                 aida.histogram1D(id + "/momentum", 100, 0., 2.).fill(cHits.getMCParticle(0).getMomentum().magnitude());
                                 aida.histogram1D(id + "/thetaY", 100, -0.1, 0.1).fill(thetaY);
