@@ -101,6 +101,8 @@
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TLegend.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TPave.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TBox.h
+./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TStyle.h
+./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TColor.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TRint.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TApplication.h
 ./comp_C.so: /home/goodwill/root-6.20.04/obj/include/TApplicationImp.h
