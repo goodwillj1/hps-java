@@ -14,6 +14,8 @@ import static java.lang.Math.*;
 //import hep.physics.vec.VecOp;
 //import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
 //import org.hps.recon.ecal.cluster.ClusterUtilities;
 //import org.hps.recon.tracking.TrackType;
 //import org.hps.recon.tracking.TrackType;
@@ -28,6 +30,7 @@ import org.lcsim.util.Driver;
 import org.lcsim.util.aida.AIDA;
 import org.hps.recon.tracking.*;
 import org.lcsim.event.*;
+import java.util.Random.*;
 
 public class DataMuonAnalysis extends Driver {
     private final AIDA aida = AIDA.defaultInstance();
@@ -46,7 +49,7 @@ public class DataMuonAnalysis extends Driver {
     
     
     private void analyzeData(final EventHeader event) {
-        List<ReconstructedParticle> rpList = event.get(ReconstructedParticle.class, "FinalStateParticles");
+        final List<ReconstructedParticle> rpList = event.get(ReconstructedParticle.class, "FinalStateParticles");
         List<Cluster> clusters;
         Track t = null;
         String id = null;
@@ -55,7 +58,7 @@ public class DataMuonAnalysis extends Driver {
         Hep3Vector pmom = null;
         int pdgId;
         double delThetaX;
-        for (ReconstructedParticle rp : rpList) {
+        for (final ReconstructedParticle rp : rpList) {
             pmom = rp.getMomentum();
             thetaY = atan2(pmom.y(), pmom.z());//asin(pmom.y() / pmom.magnitude());
             thetaX = atan2(pmom.x(), pmom.z());
@@ -73,20 +76,20 @@ public class DataMuonAnalysis extends Driver {
                 id = "photon";
                 break;
             }
-            TrackState st = TrackUtils.getTrackStateAtECal(t);
+            final TrackState st = TrackUtils.getTrackStateAtECal(t);
             if (!clusters.isEmpty()) {
-                Cluster c = clusters.get(0);
-                double[] cPos = c.getPosition();
-                double[] ePos = st.getReferencePoint();
+                final Cluster c = clusters.get(0);
+                final double[] cPos = c.getPosition();
+                final double[] ePos = st.getReferencePoint();
                 //double[] ar = st.getMomentum();
-                double tanlam = st.getTanLambda();
-                double phi = st.getPhi();
+                final double tanlam = st.getTanLambda();
+                final double phi = st.getPhi();
                 //System.out.println(ePos[1]);
                 delThetaX = atan2(ePos[1],913) - phi;
                 //System.out.println("z= " + ePos[0] + " x= " + ePos[1] + " y= " + ePos[2]);
                 if(!Double.isNaN(delThetaX)){
                     //System.out.println(delThetaX);
-                    aida.histogram2D(id + "/enDelThetaX",100, 0., 0.3, 100, -0.5, 0.5).fill(c.getEnergy(), delThetaX);
+                    aida.histogram2D(id + "/enDelThetaX",100, 0., 0.3, 100, -0.2, 0.2).fill(c.getEnergy(), delThetaX);
                 }
                 aida.histogram1D(id + "/tanlam", 100, -2., 2.).fill(tanlam);
                 aida.histogram1D(id + "/momentum", 100, 0., 2.).fill(pmom.magnitude());
@@ -112,6 +115,8 @@ public class DataMuonAnalysis extends Driver {
         // List<MCParticle> mcList = event.get(MCParticle.class, "MCParticle");
         final List<SimCalorimeterHit> calHits = event.get(SimCalorimeterHit.class, "EcalHits");
         final List<SimTrackerHit> trackHits = event.get(SimTrackerHit.class, "TrackerHitsECal");
+        Random random = new Random();
+        //double sigma;
         int pdgId;
         String id;
         double thetaY;
@@ -120,6 +125,7 @@ public class DataMuonAnalysis extends Driver {
         double dely;
         int hitCount = 0;
         double sumEnergy = 0;
+        double smearEnergy;
         double delThetaX;
         double[] ar;
         //double thX;
@@ -140,15 +146,17 @@ public class DataMuonAnalysis extends Driver {
                     for (final SimCalorimeterHit cHits : calHits) {
                         if (trckHits.getMCParticle() == cHits.getMCParticle(0)){
                             if(cHits.getCorrectedEnergy() > 0.01){
-
+                                smearEnergy= cHits.getCorrectedEnergy() + random.nextGaussian() * 0.015;
+                                System.out.println(random.nextGaussian() * 0.02);
                                 hitCount++;
-                                sumEnergy += cHits.getContributedEnergy(0);
+                                sumEnergy += cHits.getContributedEnergy(0) + random.nextGaussian() * 0.02;
                                 thetaY = atan2(cHits.getMCParticle(0).getMomentum().y(), cHits.getMCParticle(0).getMomentum().z());
                                 thetaX = atan2(cHits.getMCParticle(0).getMomentum().x(), cHits.getMCParticle(0).getMomentum().z());
                                 ar = trckHits.getMomentum();
-                                delThetaX = atan2(trckHits.getPositionVec().x(), 913.);
+                                //System.out.println(ar[0] + " " + ar[1] + " " + ar[2]); 
+                                delThetaX = atan2(trckHits.getPositionVec().x(), 913.) - atan2(ar[0], ar[2]);
                                 if(!Double.isNaN(delThetaX)){
-                                    aida.histogram2D(id + "/enDelThetaX",100, 0., 0.3, 100, -0.5, 0.5).fill(cHits.getContributedEnergy(0), delThetaX);
+                                    aida.histogram2D(id + "/enDelThetaX",100, 0., 0.3, 100, -0.2, 0.2).fill(cHits.getContributedEnergy(0), delThetaX);
                                 }
                                 aida.histogram1D(id + "/momentum", 100, 0., 2.).fill(cHits.getMCParticle(0).getMomentum().magnitude());
                                 aida.histogram1D(id + "/thetaY", 100, -0.1, 0.1).fill(thetaY);
@@ -161,7 +169,8 @@ public class DataMuonAnalysis extends Driver {
                                     aida.histogram2D(id + "/delXdelY", 200,-100.,100.,200,-50.,50.).fill(delx,dely);
                                 }
                                 aida.histogram2D(id + "/XEn",  320, -270.0, 370.0, 100, 0., 0.3).fill(trckHits.getPositionVec().x(), cHits.getContributedEnergy(0));
-                                aida.histogram1D(id + "/energy", 100, 0., 0.3).fill(cHits.getCorrectedEnergy());
+                                //aida.histogram1D(id + "/energy", 100, 0., 0.3).fill(cHits.getCorrectedEnergy());
+                                aida.histogram1D(id + "/energy", 100, 0., 0.3).fill(smearEnergy);
                                 aida.histogram2D(id + "/EnergyVsmom", 100, 0., 3., 100, 0., 3.).fill(cHits.getCorrectedEnergy(), cHits.getMCParticle(0).getMomentum().magnitude());
                                 aida.histogram1D(id + "/Energy\\mom", 100, 0., 1.).fill(cHits.getContributedEnergy(0)/cHits.getMCParticle(0).getMomentum().magnitude());
                             }
