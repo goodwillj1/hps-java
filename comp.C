@@ -23,56 +23,6 @@
 #include <string>
 using namespace std; 
 
-Double_t myFitFunction(Double_t *x,Double_t *par) {
-      Double_t arg = 0;
-      if (par[2]!=0) arg = (x[0] - par[1])/par[2];
-      Double_t fitval = par[0]*TMath::Exp(-0.5*arg*arg);
-      return fitval;
-}
-
-Double_t langaufun(Double_t *x, Double_t *par) {
-   //Fit parameters:
-   //par[0]=Width (scale) parameter of Landau density
-   //par[1]=Most Probable (MP, location) parameter of Landau density
-   //par[2]=Total area (integral -inf to inf, normalization constant)
-   //par[3]=Width (sigma) of convoluted Gaussian function
-   //
-   //In the Landau distribution (represented by the CERNLIB approximation),
-   //the maximum is located at x=-0.22278298 with the location parameter=0.
-   //This shift is corrected within this function, so that the actual
-   //maximum is identical to the MP parameter.
-      // Numeric constants
-      Double_t invsq2pi = 0.3989422804014;   // (2 pi)^(-1/2)
-      Double_t mpshift  = -0.22278298;       // Landau maximum location
-      // Control constants
-      Double_t np = 100.0;      // number of convolution steps
-      Double_t sc =   5.0;      // convolution extends to +-sc Gaussian sigmas
-      // Variables
-      Double_t xx;
-      Double_t mpc;
-      Double_t fland;
-      Double_t sum = 0.0;
-      Double_t xlow,xupp;
-      Double_t step;
-      Double_t i;
-      // MP shift correction
-      mpc = par[1] - mpshift * par[0];
-      // Range of convolution integral
-      xlow = x[0] - sc * par[3];
-      xupp = x[0] + sc * par[3];
-      step = (xupp-xlow) / np;
-      // Convolution integral of Landau and Gaussian by sum
-      for(i=1.0; i<=np/2; i++) {
-         xx = xlow + (i-.5) * step;
-         fland = TMath::Landau(xx,mpc,par[0]) / par[0];
-         sum += fland * TMath::Gaus(x[0],xx,par[3]);
-         xx = xupp - (i-.5) * step;
-         fland = TMath::Landau(xx,mpc,par[0]) / par[0];
-         sum += fland * TMath::Gaus(x[0],xx,par[3]);
-      }
-      return (par[2] * step * sum * invsq2pi / par[3]);
-}
-
 void mu2(int pdgId) {
     TFile *data = new TFile("dataOut.root","READ");
     TFile *mc = new TFile("mcOut.root","READ");
@@ -99,12 +49,15 @@ void mu2(int pdgId) {
     TF1 *fa1 = new TF1("fa1", "[0] + [1]*x + [2]*TMath::Gaus(x,[3],[4])", 0.1, 0.26);
     double max = sumEnergy->GetMaximum();
     fa1->SetParameters(0,0,max,0.17,0.03);
+    fa1->SetParNames("const","lin","max","MPV","sigma");
     fa1->SetLineColor(1);
     fa1->SetRange(0.1,0.3);
     TCanvas *c1 = new TCanvas("c1",hname,1000,1000);
     c1->Divide(2,3);
     c1->cd(1);
-    xyECal->SetTitle("xyECal");
+    xyECal->SetTitle("");
+    xyECal->GetYaxis()->SetTitle("Y (mm)");
+    xyECal->GetXaxis()->SetTitle("X (mm)");
     xyECal->Draw("COLZ");
     c1->cd(3);
     energy->SetTitle("Energy");
@@ -125,7 +78,11 @@ void mu2(int pdgId) {
 
 
     c1->cd(2);
-    xyECal->SetTitle("xyECal"); //score
+    xyECal->SetTitle(""); //score
+    xyECal->GetYaxis()->SetTitle("Y (mm)");
+    xyECal->GetXaxis()->SetTitle("X (mm)");
+    xyECal->GetXaxis()->SetRangeUser(-320, 100);
+    xyECal->GetYaxis()->SetRangeUser(0, 100);
     xyECal->Draw("COLZ");
     c1->cd(4);
     energy->SetTitle("Energy");
@@ -142,7 +99,7 @@ void mu2(int pdgId) {
     thetaY->SetTitle("thetaY");
     thetaY->Draw();
     c1->cd(5);
-    xEn->SetTitle("X vs Energy");
+    //xEn->SetTitle("X vs Energy");
     xEn->Draw("COLZ");
 
     thetaX = (TH1*)mc->Get(hname + "/thetaX");
@@ -150,13 +107,13 @@ void mu2(int pdgId) {
     xEn = (TH1*)mc->Get(hname + "/XEn");
 
     c1->cd(2);
-    thetaX->SetTitle("thetaX");
+    //thetaX->SetTitle("thetaX");
     thetaX->Draw();
     c1->cd(4);
-    thetaY->SetTitle("thetaY");
+    //thetaY->SetTitle("thetaY");
     thetaY->Draw();
     c1->cd(6);
-    xEn->SetTitle("x vs Energy");
+    //xEn->SetTitle("x vs Energy");
     xEn->Draw("COLZ");
     c1->Print(hname + "Comp.pdf","pdf");
     c1->Clear();
@@ -164,13 +121,20 @@ void mu2(int pdgId) {
 
     c1->Divide(2,3);
     c1->cd(1);
-    hits->SetTitle("hits");
+    hits->SetTitle("");
+    hits->GetYaxis()->SetTitle("Counts");
+    hits->GetYaxis()->SetLabelSize(0.03);
+    hits->GetXaxis()->SetTitle("Number of Hits");
     hits->Draw();
     c1->cd(3);
-    dxdy->SetTitle("Delta X vs Delta Y");
+    dxdy->SetTitle("");
+    dxdy->GetYaxis()->SetTitle("Y (mm)");
+    dxdy->GetXaxis()->SetTitle("X (mm)");
     dxdy->Draw("COLZ");
     c1->cd(5);
-    enMom->SetTitle("Energy Vs Momentum");
+    enMom->SetTitle("");
+    enMom->GetYaxis()->SetTitle("Energy (GeV)");
+    enMom->GetXaxis()->SetTitle("Momentum (GeV)");
     enMom->Draw("COLZ");
 
     hits = (TH1*)mc->Get(hname + "/hits");
@@ -178,13 +142,19 @@ void mu2(int pdgId) {
     enMom = (TH1*)mc->Get(hname + "/EnergyVsmom");
 
     c1->cd(2);
-    hits->SetTitle("hits");
+    hits->SetTitle("");
+    hits->GetYaxis()->SetTitle("Counts");
+    hits->GetXaxis()->SetTitle("Number of Hits");
     hits->Draw();
     c1->cd(4);
-    dxdy->SetTitle("Delta X vs Delta Y");
+    dxdy->SetTitle("");
+    dxdy->GetYaxis()->SetTitle("Y (mm)");
+    dxdy->GetXaxis()->SetTitle("X (mm)");
     dxdy->Draw("COLZ");
     c1->cd(6);
-    enMom->SetTitle("Energy Vs Momentum");
+    enMom->SetTitle("");
+    enMom->GetYaxis()->SetTitle("Energy (GeV)");
+    enMom->GetXaxis()->SetTitle("Momentum (GeV)");
     enMom->Draw("COLZ");
     c1->Print(hname + "Comp.pdf","pdf");
 
@@ -192,9 +162,15 @@ void mu2(int pdgId) {
     c1->Clear();
     c1->Divide(2,3);
     c1->cd(1);
-    sumEnergy->SetTitle("Sum of Hit Energies");
+    sumEnergy->SetTitle("");
+    sumEnergy->GetYaxis()->SetTitle("Counts");
+    sumEnergy->GetYaxis()->SetTitleSize(0.045);
+    sumEnergy->GetXaxis()->SetTitle("Energy (GeV)");
+    
     //sumEnergy->GetYaxis()->SetRangeUser(0., 3000.);
+    gStyle->SetLabelSize(0.02);
     gStyle->SetOptFit();
+    gStyle->SetOptStat(0);
     sumEnergy->Fit(fa1,"R");
     TLegend *leg = new TLegend(0.1,0.7,0.48,0.9);
     leg->SetHeader("Number of Hits","C");
@@ -221,7 +197,7 @@ void mu2(int pdgId) {
         }
         //sumEnergy->Draw("SAMES");
     }
-    leg->Draw();
+    //leg->Draw();
 
 
     c1->cd(2);
@@ -234,8 +210,11 @@ void mu2(int pdgId) {
     //sumEnergy = (TH1*)mc->Get(hname + "/sumEnergy1");
     //sumEnergy->Draw();
     sumEnergy = (TH1F*)mc->Get(hname + "/sumEnergy1");
+    sumEnergy->SetTitle("");
+    sumEnergy->GetYaxis()->SetTitle("Counts");
+    sumEnergy->GetYaxis()->SetLabelSize(0.025);
+    sumEnergy->GetXaxis()->SetTitle("Energy (GeV)");
     max = sumEnergy->GetMaximum();
-    fa1->SetParameters(0,0,max,0.17,0.03);
     gStyle->SetOptFit();
     
     sumEnergy->Fit(fa1,"R+");
@@ -260,32 +239,70 @@ void mu2(int pdgId) {
             sumEnergy->SetLineColor(5);
             //leg->AddEntry(sumEnergy,"5" ,"l");
         }
-        sumEnergy->Fit(fa1,"R+");
+        //sumEnergy->Fit(fa1,"R+");
         //sumEnergy->Draw("SAMES");
     }
-    leg->Draw();
+    //leg->Draw();
 
     c1->cd(3);
-/*
-    TF1 *f=new TF1("fa1", "[0] + [1]*x + [2]*TMath::Gaus(x,[3],[4])", 0.1, 0.26);
+
+    TF1 *f=new TF1("f", "[0] + [1]*x + [2]*TMath::Gaus(x,[3],[4])", 0.1, 0.26);
     TH2 *h2 = (TH2*)data->Get(hname + "/enDelThetaX");
-    TGraphErrors *g = new TGraphErrors(h2);
+    TH1 *h1 = h2->ProjectionX(Form("h1_%d",1),1,1);
+    h1->GetYaxis()->SetRangeUser(0,400);
+    //h1->SetTitle("Energy Vs Delta Projection X");
+    h1->GetXaxis()->SetTitle("Energy (GeV)");
+    h1->GetYaxis()->SetTitle("Counts");
+    h1->Draw();
+    //TGraphErrors *g = new TGraphErrors(f);
+    //
  
     for (int bin=1; bin<=h2->GetNbinsX(); bin++) {
-        TH1 *h1 = h2->ProjectionX(Form("h1_%d",bin),bin,bin);
-        h1->Fit("fit","R");
+        h1->GetXaxis()->SetTitle("Energy (GeV)");
+        h1->GetYaxis()->SetTitle("Counts");
+        h1 = h2->ProjectionX(Form("h1_%d",bin),bin,bin);
+        TGraphErrors *g = new TGraphErrors(h1);
+        //h1->Fit("f","SAME");
+        h1->Draw("SAMES");
         double x = h2->GetXaxis()->GetBinCenter(bin);
-        double y = f->GetParameter(1);
+        //cout << "x=" << x << endl;
+        double y = f->GetParameter(0);
+        //cout << "y=" << y << endl;
+        //cout << *f->GetParameters() << endl;
         g->SetPoint(bin,x,y);
     }
-    */
-    enDelThetaX->SetTitle("Energy vs Delta Theta X");
-    enDelThetaX->Draw("COLZ");
+    
+    //enDelThetaX->SetTitle("Energy vs Delta Theta X");
+    //enDelThetaX->Draw("COLZ");
 
     c1->cd(4);
-    enDelThetaX= (TH1*)mc->Get(hname + "/enDelThetaX");
-    enDelThetaX->SetTitle("Energy vs Delta Theta X");
-    enDelThetaX->Draw("COLZ");
+    TH2 *mcEnDelThX = (TH2*)mc->Get(hname + "/enDelThetaX");
+    TH1 *mcProjX = mcEnDelThX->ProjectionX(Form("mcProjX_%d",1),1,1);
+    mcProjX->GetYaxis()->SetRangeUser(0,1000);
+    mcProjX->SetTitle("Energy Vs Delta Projection X");
+    mcProjX->GetXaxis()->SetTitle("Energy (GeV)");
+    mcProjX->GetYaxis()->SetTitle("Counts");
+    mcProjX->Draw();
+    //TGraphErrors *g = new TGraphErrors(f);
+    //
+ 
+    for (int bin=1; bin<=mcEnDelThX->GetNbinsX(); bin++) {
+        mcProjX->GetXaxis()->SetTitle("Energy (GeV)");
+        mcProjX->GetYaxis()->SetTitle("Counts");
+        mcProjX = mcEnDelThX->ProjectionX(Form("mcProjX_%d",bin),bin,bin);
+        //TGraphErrors *g = new TGraphErrors(h1);
+        //h1->Fit("f","SAME");
+        mcProjX->Draw("SAMES");
+        double x = h2->GetXaxis()->GetBinCenter(bin);
+        //cout << "x=" << x << endl;
+        double y = f->GetParameter(0);
+        //cout << "y=" << y << endl;
+        //cout << *f->GetParameters() << endl;
+        //g->SetPoint(bin,x,y);
+    }
+    //enDelThetaX= (TH1*)mc->Get(hname + "/enDelThetaX");
+    //enDelThetaX->SetTitle("Energy vs Delta Theta X");
+    //enDelThetaX->Draw("COLZ");
 
 
     c1->Print(hname + "Comp.pdf)","pdf");

@@ -146,7 +146,7 @@ public class DataMuonAnalysis extends Driver {
                     for (final SimCalorimeterHit cHits : calHits) {
                         if (trckHits.getMCParticle() == cHits.getMCParticle(0)){
                             if(cHits.getCorrectedEnergy() > 0.01){
-                                smearEnergy= cHits.getCorrectedEnergy() + random.nextGaussian() * 0.015;
+                                smearEnergy= cHits.getCorrectedEnergy() + random.nextGaussian() * 0.013;
                                 System.out.println(random.nextGaussian() * 0.02);
                                 hitCount++;
                                 sumEnergy += cHits.getContributedEnergy(0) + random.nextGaussian() * 0.02;
