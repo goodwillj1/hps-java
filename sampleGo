@@ -1,0 +1,5 @@
+mvn install -DskipTests=true
+
+java -jar distribution/target/hps-distribution-4.5-SNAPSHOT-bin.jar -r /org/hps/steering/analysis/DataMuonAnalysis.lcsim -d HPS-PhysicsRun2019-v2-4pt5 -R 10651 -i /home/goodwill/hps2019/mc/samplingFractionMC/hpsForward_mu-_1.0GeV_z-7.5_0_SLIC-v06-00-01_QGSP_BERT_HPS-PhysicsRun2019-v2-4pt5.slcio -DoutputFile=mcOutSample
+
+java -jar distribution/target/hps-distribution-4.5-SNAPSHOT-bin.jar -r /org/hps/steering/analysis/DataMuonAnalysis.lcsim  -d HPS-PhysicsRun2019-v2-4pt5 -R 10651 -i /home/goodwill/hps2019/data/muonSkim/hps_010650.evio.000_muonSkim_0.evio_skimMuMu.slcio -i /home/goodwill/hps2019/data/muonSkim/hps_010650.evio.000_muonSkim_1.evio_skimMuMu.slcio -DoutputFile=dataOutSample

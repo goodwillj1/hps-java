@@ -45,7 +45,7 @@ void mu2(int pdgId) {
     TH1 *dxdy = (TH1*)data->Get(hname + "/delXdelY");
     TH1 *enMom = (TH1*)data->Get(hname + "/EnergyVsmom");
     TH1F *sumEnergy = (TH1F*)data->Get(hname + "/sumEnergy1");
-    TH1 *enDelThetaX = (TH1*)data->Get(hname + "/enDelThetaX");
+    TH2 *enDelThetaX = (TH2*)data->Get(hname + "/enDelThetaX");
     TF1 *fa1 = new TF1("fa1", "[0] + [1]*x + [2]*TMath::Gaus(x,[3],[4])", 0.1, 0.26);
     double max = sumEnergy->GetMaximum();
     fa1->SetParameters(0,0,max,0.17,0.03);
@@ -133,8 +133,8 @@ void mu2(int pdgId) {
     dxdy->Draw("COLZ");
     c1->cd(5);
     enMom->SetTitle("");
-    enMom->GetYaxis()->SetTitle("Energy (GeV)");
-    enMom->GetXaxis()->SetTitle("Momentum (GeV)");
+    enMom->GetYaxis()->SetTitle("Momentum (GeV)");
+    enMom->GetXaxis()->SetTitle("Energy (GeV)");
     enMom->Draw("COLZ");
 
     hits = (TH1*)mc->Get(hname + "/hits");
@@ -153,8 +153,8 @@ void mu2(int pdgId) {
     dxdy->Draw("COLZ");
     c1->cd(6);
     enMom->SetTitle("");
-    enMom->GetYaxis()->SetTitle("Energy (GeV)");
-    enMom->GetXaxis()->SetTitle("Momentum (GeV)");
+    enMom->GetYaxis()->SetTitle("Momentum (GeV)");
+    enMom->GetXaxis()->SetTitle("Energy (GeV)");
     enMom->Draw("COLZ");
     c1->Print(hname + "Comp.pdf","pdf");
 
@@ -243,14 +243,22 @@ void mu2(int pdgId) {
         //sumEnergy->Draw("SAMES");
     }
     //leg->Draw();
-    c1->Print(hname + "Comp.pdf","pdf");
 
+
+    c1->cd(3);
+    enDelThetaX->Draw("COLZ");
+
+    c1->cd(4);
+    enDelThetaX = (TH2*)mc->Get(hname + "/enDelThetaX");
+    enDelThetaX->Draw("COLZ");
+
+    c1->Print(hname + "Comp.pdf","pdf");
     c1->Clear();
-    c1->Divide(6,6);
+    c1->Divide(10,10);
 
     //TF1 *f=new TF1("f", "[0] + [1]*x + [2]*TMath::Gaus(x,[3],[4])", 0.1, 0.26);
     TH2 *h2 = (TH2*)data->Get(hname + "/enDelThetaX");
-    TH1 *h1 = h2->ProjectionX(Form("h1_%d",1),0,5);
+    TH1 *h1 = h2->ProjectionX(Form("h1_%d",1),1,1);
     h1->GetYaxis()->SetRangeUser(0,400);
     //h1->SetTitle("Energy Vs Delta Projection X");
     h1->GetXaxis()->SetTitle("Energy (GeV)");
@@ -258,7 +266,7 @@ void mu2(int pdgId) {
     c1->cd(1);
     //TGraphErrors *g = new TGraphErrors(f);
     //
-    int dir = 0;
+    int dir = 1;
     for (int bin=1; bin<=h2->GetNbinsX(); bin++) {
             h1->SetTitle("Data");
             h1->GetXaxis()->SetTitle("Energy (GeV)");
@@ -273,49 +281,50 @@ void mu2(int pdgId) {
             h1->Fit(fa1,"R+");
         }
         //h1->Draw();
-        double x = h2->GetXaxis()->GetBinCenter(bin);
+        //double x = h2->GetXaxis()->GetBinCenter(bin);
         //cout << "x=" << x << endl;
-        double y = fa1->GetParameter(0);
+        //double y = fa1->GetParameter(0);
         //cout << "y=" << y << endl;
         //cout << *f->GetParameters() << endl;
         //g->SetPoint(bin,x,y);
     }
     c1->Print(hname + "Comp.pdf","pdf");
+
     c1->Clear();
-    c1->Divide(6,6);
-    
-    //TF1 *f=new TF1("f", "[0] + [1]*x + [2]*TMath::Gaus(x,[3],[4])", 0.1, 0.26);
+    c1->Divide(10,10);
     TH2 *mch2 = (TH2*)mc->Get(hname + "/enDelThetaX");
-    TH1 *mch1 = mch2->ProjectionX(Form("mch1_%d",1),0,5);
-    mch1->GetYaxis()->SetRangeUser(0,400);
-    //h1->SetTitle("Energy Vs Delta Projection X");
+    TH1 *mch1 = (TH1*)mch2->ProjectionX(Form("mch1_%d",1),0,5);
+    mch1->SetTitle("Sim");
     mch1->GetXaxis()->SetTitle("Energy (GeV)");
     mch1->GetYaxis()->SetTitle("Counts");
-    c1->cd(1);
+    mch1->Fit(fa1,"R+");
+    mch1->GetYaxis()->SetRangeUser(0,1000);
+    //h1->SetTitle("Energy Vs Delta Projection X");
+
     //TGraphErrors *g = new TGraphErrors(f);
+    TGraphErrors *mcg = new TGraphErrors();
     //
-    int mcdir = 0;
-    for (int mcbin=1; mcbin<=h2->GetNbinsX(); mcbin++) {
-            mch1->SetTitle("Sim");
-            mch1->GetXaxis()->SetTitle("Energy (GeV)");
-            mch1->GetYaxis()->SetTitle("Counts");
-            mch1 = mch2->ProjectionX(Form("mch1_%d",mcbin),mcbin,mcbin);
-            TGraphErrors *mcg = new TGraphErrors(h1);
+    int mcdir = 1;
+    for (int mcbin=1; mcbin<=mch2->GetNbinsX(); mcbin++) {
+        mch1->SetTitle("Sim");
+        mch1->GetXaxis()->SetTitle("Energy (GeV)");
+        mch1->GetYaxis()->SetTitle("Counts");
+        mch1 = mch2->ProjectionX(Form("mch1_%d",mcbin),mcbin,mcbin);
         if(mch1->GetMaximum() > 0 ){
             c1->cd(mcdir);
             mcdir++;
             max=mch1->GetMaximum();
             fa1->SetParameters(0,0,max,0.17,0.03);
-            //mch1->Fit(fa1,"R+");
-            mch1->Draw();
+            mch1->Fit(fa1,"R");
+            //mch1->Draw();
         }
         //h1->Draw();
-        double x = mch2->GetXaxis()->GetBinCenter(mcbin);
+        //double x = mch2->GetXaxis()->GetBinCenter(mcbin);
         //cout << "x=" << x << endl;
-        double y = fa1->GetParameter(0);
+        //double y = fa1->GetParameter(0);
         //cout << "y=" << y << endl;
         //cout << *f->GetParameters() << endl;
-        //g->SetPoint(bin,x,y);
+        //mcg->SetPoint(mcbin,x,y);
     }
 
 

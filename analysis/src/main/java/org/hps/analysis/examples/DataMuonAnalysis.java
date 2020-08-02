@@ -125,7 +125,7 @@ public class DataMuonAnalysis extends Driver {
         double dely;
         int hitCount = 0;
         double sumEnergy = 0;
-        double smearEnergy;
+        double smearEnergy = 0;
         double delThetaX;
         double[] ar;
         //double thX;
@@ -146,8 +146,8 @@ public class DataMuonAnalysis extends Driver {
                     for (final SimCalorimeterHit cHits : calHits) {
                         if (trckHits.getMCParticle() == cHits.getMCParticle(0)){
                             if(cHits.getCorrectedEnergy() > 0.01){
-                                smearEnergy= cHits.getCorrectedEnergy() + random.nextGaussian() * 0.013;
-                                System.out.println(random.nextGaussian() * 0.02);
+                                smearEnergy= cHits.getCorrectedEnergy() + random.nextGaussian() * 0.014;
+                                //System.out.println(random.nextGaussian() * 0.02);
                                 hitCount++;
                                 sumEnergy += cHits.getContributedEnergy(0) + random.nextGaussian() * 0.02;
                                 thetaY = atan2(cHits.getMCParticle(0).getMomentum().y(), cHits.getMCParticle(0).getMomentum().z());
@@ -170,14 +170,14 @@ public class DataMuonAnalysis extends Driver {
                                 }
                                 aida.histogram2D(id + "/XEn",  320, -270.0, 370.0, 100, 0., 0.3).fill(trckHits.getPositionVec().x(), cHits.getContributedEnergy(0));
                                 //aida.histogram1D(id + "/energy", 100, 0., 0.3).fill(cHits.getCorrectedEnergy());
-                                aida.histogram1D(id + "/energy", 100, 0., 0.3).fill(smearEnergy);
+                                aida.histogram1D(id + "/energy", 100, 0., 0.3).fill(cHits.getContributedEnergy(0));
                                 aida.histogram2D(id + "/EnergyVsmom", 100, 0., 3., 100, 0., 3.).fill(cHits.getCorrectedEnergy(), cHits.getMCParticle(0).getMomentum().magnitude());
                                 aida.histogram1D(id + "/Energy\\mom", 100, 0., 1.).fill(cHits.getContributedEnergy(0)/cHits.getMCParticle(0).getMomentum().magnitude());
                             }
                         }
                     }
                     aida.histogram1D(id + "/hits",20, 0., 20.).fill(hitCount);
-                    aida.histogram1D(id+"/sumEnergy"+hitCount,100, 0., 0.3).fill(sumEnergy);
+                    aida.histogram1D(id+"/sumEnergy"+hitCount,100, 0., 0.3).fill(smearEnergy);
                     if (hitCount>0 && hitCount<6) {
                         for (final SimCalorimeterHit cHits : calHits) {
                             if (trckHits.getMCParticle() == cHits.getMCParticle(0)){
